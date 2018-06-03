@@ -1,9 +1,12 @@
-﻿using MerchantBE.Models;
+﻿using MerchantBE.Request;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Net.Http.Headers;
+using System.Text;
 using System.Web.Http;
 
 namespace MerchantBE.Controllers
@@ -23,14 +26,40 @@ namespace MerchantBE.Controllers
         }
 
         // POST: api/Sale
-        public void Post([FromBody]SaleInfo saleInfo)
+        public async System.Threading.Tasks.Task PostAsync([FromBody]SaleRequest saleRequest)
         {
             // Merchant Tableti tarafından POST edilen transaction bilgilerini al. 
             // DB'ye bekleniyor statusunde kayıt at.
             // BankBE'ye aynı bilgileri POST'et.
             SalePersistence sp = new SalePersistence();
             long guid = 0;
-            guid = sp.insertTransaction(saleInfo);
+            guid = sp.insertTransaction(saleRequest);
+
+            using (HttpClient client = new HttpClient())
+            {
+                string serviceUrl = "http://localhost:50459/api/BankSale";
+                client.DefaultRequestHeaders.Clear();
+                var username = "user";
+                var password = "pass";
+                client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(Encoding.UTF8.GetBytes($"{username}:{password}")));
+
+                JObject payLoad = new JObject(
+                       new JProperty("merchant_no", saleRequest.merchant_no),
+                       new JProperty("terminal_no", saleRequest.terminal_no),
+                       new JProperty("amount", saleRequest.amount)
+                   );
+
+                var httpContent = new StringContent(payLoad.ToString(), Encoding.UTF8, "application/json");
+
+                using (HttpResponseMessage response = await client.PostAsync(serviceUrl, httpContent))
+                {
+                    response.EnsureSuccessStatusCode();
+                    string responseBody = await response.Content.ReadAsStringAsync();
+                    var a = JObject.Parse(responseBody);
+                    
+                }
+            }
 
 
         }

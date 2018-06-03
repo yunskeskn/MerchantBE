@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
-using MerchantBE.Models;
+using MerchantBE.Request;
 using MySql.Data;
 
 namespace MerchantBE
@@ -28,9 +28,9 @@ namespace MerchantBE
             }
         }
 
-        public long insertTransaction(SaleInfo saleInfo)
+        public long insertTransaction(SaleRequest saleRequest)
         {
-            string sqlString = "Insert into transaction (merchant_no, terminal_no, amount, transaction_status)values('" + saleInfo.merchant_no + "','" + saleInfo.terminal_no + "'," + saleInfo.amount + ", 'P')";
+            string sqlString = "Insert into merchant_transaction (merchant_no, terminal_no, amount, transaction_status)values('" + saleRequest.merchant_no + "','" + saleRequest.terminal_no + "'," + saleRequest.amount + ", 'P')";
             MySql.Data.MySqlClient.MySqlCommand cmd = new MySql.Data.MySqlClient.MySqlCommand(sqlString, conn);
             cmd.ExecuteNonQuery();
             long guid = cmd.LastInsertedId;

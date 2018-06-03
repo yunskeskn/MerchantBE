@@ -192,6 +192,7 @@
     </Compile>
     <Compile Include="Models\SaleInfo.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Request\SaleRequest.cs" />
     <Compile Include="SalePersistence.cs" />
   </ItemGroup>
   <ItemGroup>
