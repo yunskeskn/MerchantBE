@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using MerchantBE.Request;
+using MerchantBE.Response;
 using MySql.Data;
 
 namespace MerchantBE
@@ -14,7 +15,7 @@ namespace MerchantBE
         public SalePersistence()
         {
             string myConnectionString;
-            myConnectionString = "server=127.0.0.1;uid=Yunus;pwd=av7vgqggx;database=merchant";
+            myConnectionString = "server=127.0.0.1;uid=root;pwd=3418;database=merchant";
             try
             {
                 conn = new MySql.Data.MySqlClient.MySqlConnection();
@@ -37,5 +38,13 @@ namespace MerchantBE
             return guid;
         }
 
+        public int updateTransactionfromBank(long guid,SaleResponse saleResponse)
+        {
+            string sqlString = "Update merchant_transaction set bank_transaction_guid ="+saleResponse.bank_transaction_guid+", token_data = '"+saleResponse.token_data+"' where guid ="+guid;
+            MySql.Data.MySqlClient.MySqlCommand cmd = new MySql.Data.MySqlClient.MySqlCommand(sqlString, conn);
+            int result = cmd.ExecuteNonQuery();
+            
+            return result;
+        }
     }
 }

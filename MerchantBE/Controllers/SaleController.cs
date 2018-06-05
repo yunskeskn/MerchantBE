@@ -1,4 +1,5 @@
 ﻿using MerchantBE.Request;
+using MerchantBE.Response;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
@@ -26,18 +27,19 @@ namespace MerchantBE.Controllers
         }
 
         // POST: api/Sale
-        public async System.Threading.Tasks.Task PostAsync([FromBody]SaleRequest saleRequest)
+        public async System.Threading.Tasks.Task<string> PostAsync([FromBody]SaleRequest saleRequest)
         {
             // Merchant Tableti tarafından POST edilen transaction bilgilerini al. 
             // DB'ye bekleniyor statusunde kayıt at.
             // BankBE'ye aynı bilgileri POST'et.
             SalePersistence sp = new SalePersistence();
-            long guid = 0;
-            guid = sp.insertTransaction(saleRequest);
+            long mrcguid = 0;
+            mrcguid = sp.insertTransaction(saleRequest);
 
             using (HttpClient client = new HttpClient())
             {
-                string serviceUrl = "http://localhost:50459/api/BankSale";
+                //string serviceUrl = "http://localhost:50459/api/BankSale";
+                string serviceUrl = "http://192.168.1.101:50461/api/BankSale";
                 client.DefaultRequestHeaders.Clear();
                 var username = "user";
                 var password = "pass";
@@ -47,7 +49,8 @@ namespace MerchantBE.Controllers
                 JObject payLoad = new JObject(
                        new JProperty("merchant_no", saleRequest.merchant_no),
                        new JProperty("terminal_no", saleRequest.terminal_no),
-                       new JProperty("amount", saleRequest.amount)
+                       new JProperty("amount", saleRequest.amount),
+                       new JProperty("merchant_transaction_guid", mrcguid)
                    );
 
                 var httpContent = new StringContent(payLoad.ToString(), Encoding.UTF8, "application/json");
@@ -56,9 +59,19 @@ namespace MerchantBE.Controllers
                 {
                     response.EnsureSuccessStatusCode();
                     string responseBody = await response.Content.ReadAsStringAsync();
-                    var a = JObject.Parse(responseBody);
-                    
+                    JObject json = JObject.Parse(responseBody);
+                    //gelen response daki bank_transaction_guid i where guid i mrcguid olanla dbde update et,tokendatayıda update et şekerim
+
+                    SaleResponse resp = new SaleResponse();
+                    resp.token_data = json["token_data"].ToString();
+                    resp.bank_transaction_guid = (long)json["bank_transaction_guid"];
+                    sp.updateTransactionfromBank(mrcguid,resp);
+
+
+                    return resp.token_data;
                 }
+
+
             }
 
 

@@ -18,7 +18,7 @@ namespace MerchantBE.Request
         [DataMember(Name = "amount")]
         public double amount { get; set; }
 
-        [DataMember(Name = "bank_transaction_guid")]
-        public long bank_transaction_guid { get; set; }
+        //[DataMember(Name = "bank_transaction_guid")] //bi bak
+        //public long bank_transaction_guid { get; set; }
     }
 }
