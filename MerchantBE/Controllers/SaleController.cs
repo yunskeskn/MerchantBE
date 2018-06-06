@@ -27,7 +27,7 @@ namespace MerchantBE.Controllers
         }
 
         // POST: api/Sale
-        public async System.Threading.Tasks.Task<string> PostAsync([FromBody]SaleRequest saleRequest)
+        public async System.Threading.Tasks.Task<JObject> PostAsync([FromBody]SaleRequest saleRequest)
         {
             // Merchant Tableti tarafından POST edilen transaction bilgilerini al. 
             // DB'ye bekleniyor statusunde kayıt at.
@@ -38,7 +38,6 @@ namespace MerchantBE.Controllers
 
             using (HttpClient client = new HttpClient())
             {
-                //string serviceUrl = "http://localhost:50459/api/BankSale";
                 string serviceUrl = "http://192.168.1.101:50461/api/BankSale";
                 client.DefaultRequestHeaders.Clear();
                 var username = "user";
@@ -68,7 +67,7 @@ namespace MerchantBE.Controllers
                     sp.updateTransactionfromBank(mrcguid,resp);
 
 
-                    return resp.token_data;
+                    return json;
                 }
 
 
