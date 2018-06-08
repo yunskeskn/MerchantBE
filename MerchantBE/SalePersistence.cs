@@ -46,5 +46,14 @@ namespace MerchantBE
             
             return result;
         }
+
+        public int updateTransactionStatus(CompleteTransactionRequest completeTransactionRequest)
+        {
+            string sqlString = "Update merchant_transaction set transaction_status ='" + completeTransactionRequest.status + "' where guid = " + completeTransactionRequest.merchant_guid;
+            MySql.Data.MySqlClient.MySqlCommand cmd = new MySql.Data.MySqlClient.MySqlCommand(sqlString, conn);
+            int result = cmd.ExecuteNonQuery();
+
+            return result;
+        }
     }
 }

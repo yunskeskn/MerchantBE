@@ -38,7 +38,8 @@ namespace MerchantBE.Controllers
 
             using (HttpClient client = new HttpClient())
             {
-                string serviceUrl = "http://192.168.1.101:50461/api/BankSale";
+                //string serviceUrl = "http://192.168.1.101:50461/api/BankSale";
+                string serviceUrl = "http://192.168.43.14:50461/api/BankSale";
                 client.DefaultRequestHeaders.Clear();
                 var username = "user";
                 var password = "pass";
@@ -56,7 +57,15 @@ namespace MerchantBE.Controllers
 
                 using (HttpResponseMessage response = await client.PostAsync(serviceUrl, httpContent))
                 {
-                    response.EnsureSuccessStatusCode();
+                    try
+                    {
+                        response.EnsureSuccessStatusCode();
+                        // Handle success
+                    }
+                    catch (HttpRequestException e)
+                    {
+                        // Handle failure
+                    }
                     string responseBody = await response.Content.ReadAsStringAsync();
                     JObject json = JObject.Parse(responseBody);
                     //gelen response daki bank_transaction_guid i where guid i mrcguid olanla dbde update et,tokendatayıda update et şekerim
@@ -66,8 +75,11 @@ namespace MerchantBE.Controllers
                     resp.bank_transaction_guid = (long)json["bank_transaction_guid"];
                     sp.updateTransactionfromBank(mrcguid,resp);
 
+                    JObject jsonResponse = new JObject(
+                       new JProperty("token_data", resp.token_data)
+                   );
 
-                    return json;
+                    return jsonResponse;
                 }
 
 
