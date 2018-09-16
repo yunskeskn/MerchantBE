@@ -130,7 +130,9 @@ namespace MerchantBE.Controllers
 
                 //string serviceUrl = "http://192.168.1.101:50461/api/BankSale";
 
-                string serviceUrl = "https://posnetict.yapikredi.com.tr/BankBE/api/BankSale";
+                //string serviceUrl = "https://posnetict.yapikredi.com.tr/BankBE/api/BankSale";
+
+                string serviceUrl = "http://zehraisilyilmaz.com/BankBE/api/BankSale";
 
                 client.DefaultRequestHeaders.Clear();
 
